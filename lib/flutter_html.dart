@@ -41,6 +41,7 @@ class Html extends StatelessWidget {
     this.onImageError,
     this.shrinkWrap = false,
     this.onImageTap,
+    this.allowSelection = false,
     this.blacklistedElements = const [],
     this.style,
     this.navigationDelegateForIframe,
@@ -51,6 +52,8 @@ class Html extends StatelessWidget {
   final Map<ImageSourceMatcher, ImageRender> customImageRenders;
   final ImageErrorListener onImageError;
   final bool shrinkWrap;
+  final bool allowSelection;
+
 
   /// Properties for the Image widget that gets rendered by the rich text parser
   final OnTap onImageTap;
@@ -76,6 +79,7 @@ class Html extends StatelessWidget {
     return Container(
       width: width,
       child: HtmlParser(
+        allowSelection: allowSelection,
         htmlData: data,
         onLinkTap: onLinkTap,
         onImageTap: onImageTap,

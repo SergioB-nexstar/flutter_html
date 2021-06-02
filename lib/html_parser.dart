@@ -30,6 +30,7 @@ class HtmlParser extends StatelessWidget {
   final OnTap onImageTap;
   final ImageErrorListener onImageError;
   final bool shrinkWrap;
+  final bool allowSelection;
 
   final Map<String, Style> style;
   final Map<String, CustomRender> customRender;
@@ -48,6 +49,7 @@ class HtmlParser extends StatelessWidget {
     this.imageRenders,
     this.blacklistedElements,
     this.navigationDelegateForIframe,
+    @required this.allowSelection,
   });
 
   @override
@@ -255,6 +257,7 @@ class HtmlParser extends StatelessWidget {
       final render = customRender[tree.name].call(
         newContext,
         ContainerSpan(
+          allowSelection: allowSelection,
           newContext: newContext,
           style: tree.style,
           shrinkWrap: context.parser.shrinkWrap,
@@ -272,6 +275,7 @@ class HtmlParser extends StatelessWidget {
             ? render
             : WidgetSpan(
                 child: ContainerSpan(
+                  allowSelection: allowSelection,
                   newContext: newContext,
                   style: tree.style,
                   shrinkWrap: context.parser.shrinkWrap,
@@ -285,6 +289,7 @@ class HtmlParser extends StatelessWidget {
     if (tree.style?.display == Display.BLOCK) {
       return WidgetSpan(
         child: ContainerSpan(
+          allowSelection: allowSelection,
           newContext: newContext,
           style: tree.style,
           shrinkWrap: context.parser.shrinkWrap,
@@ -297,6 +302,7 @@ class HtmlParser extends StatelessWidget {
     } else if (tree.style?.display == Display.LIST_ITEM) {
       return WidgetSpan(
         child: ContainerSpan(
+          allowSelection: allowSelection,
           newContext: newContext,
           style: tree.style,
           shrinkWrap: context.parser.shrinkWrap,
@@ -739,12 +745,14 @@ class ContainerSpan extends StatelessWidget {
   final Style style;
   final RenderContext newContext;
   final bool shrinkWrap;
+  final bool allowSelection;
 
   ContainerSpan({
     this.child,
     this.children,
     this.style,
     this.newContext,
+    this.allowSelection,
     this.shrinkWrap = false,
   });
 
@@ -778,10 +786,12 @@ class StyledText extends StatelessWidget {
   final Style style;
   final double textScaleFactor;
   final RenderContext renderContext;
+  final bool allowSelection;
 
   const StyledText({
     this.textSpan,
     this.style,
+    this.allowSelection,
     this.textScaleFactor = 1.0,
     this.renderContext,
   });
@@ -790,8 +800,9 @@ class StyledText extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: calculateWidth(style.display, renderContext),
-      child: Text.rich(
+      child: SelectableText.rich(
         textSpan,
+        toolbarOptions: ToolbarOptions(copy: allowSelection, selectAll: allowSelection, cut: false, paste: false),
         style: style.generateTextStyle(),
         textAlign: style.textAlign,
         textDirection: style.direction,
